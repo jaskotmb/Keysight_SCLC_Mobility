@@ -63,7 +63,7 @@ makeTodayDir()
 
 # Initializing sweep parameters
 timeStep = 1
-numPoints = 1000
+numPoints = 101
 Vhi = 10
 Vneg = -Vhi
 currProt = 0.125
@@ -88,14 +88,16 @@ for i in mux:
         ser.write(str.encode('-' + str(i)))
         time.sleep(2)
 
+        # Sweep zero, hi, zero, low, zero
         x = LinSweep(SMU, 0, Vhi, numPoints, timeStep, currProt)
-        print('1',end='')
+        print('1...',end='')
         y = LinSweep(SMU, Vhi, Vneg, numPoints*2, timeStep, currProt)
-        print('23',end='')
+        print('2...3...',end='')
         z = LinSweep(SMU, Vneg, 0, numPoints, timeStep, currProt)
-        print('4',end='')
+        print('4...',end='')
         totalVI = x + y + z
 
+        # Write IV Data to output file
         outName = sampleName+'_'+startTimeStr
         with open('{}.csv'.format(outName), 'w',newline='') as csvfile:
             writer = csv.writer(csvfile)
@@ -104,5 +106,7 @@ for i in mux:
             for row in totalVI:
                 writer.writerow(row)
         print(" Data Saved")
+
+# Turn off SMU output, close device connection
 SMU.write(':OUTP OFF')
 SMU.close()
