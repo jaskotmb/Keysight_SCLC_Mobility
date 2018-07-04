@@ -49,6 +49,15 @@ def makeTodayDir():
     print("Changed Directory to: {}".format(os.getcwd()))
     return
 
+def writeMobility(fn,data):
+        with open(fn, 'w',newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            row1 = ["Voltage (V)","Current (A)"]
+            writer.writerow(row1)
+            for row in data:
+                writer.writerow(row)
+
+
 # Opening serial communication to Arduino multiplexer switch
 ser = serial.Serial('COM3', 9600, timeout=0)
 # Opening connection to Keysight B2901A SMU
@@ -63,7 +72,7 @@ makeTodayDir()
 
 # Initializing sweep parameters
 timeStep = 1
-numPoints = 101
+numPoints = 1001
 Vhi = 10
 Vneg = -Vhi
 currProt = 0.125
@@ -80,6 +89,7 @@ for i in mux:
         sampleName = '180626Dh1'+str(i)+'-'+str(k)
         startTimeStr = stringTime()
         print("Time: {}, Sample: {} ".format(startTimeStr,sampleName),end='')
+        outName = sampleName+'_'+startTimeStr+'.csv'
 
         # Initializing mux switch, selecting device
         time.sleep(0.5)
@@ -90,22 +100,15 @@ for i in mux:
 
         # Sweep zero, hi, zero, low, zero
         x = LinSweep(SMU, 0, Vhi, numPoints, timeStep, currProt)
-        print('1...',end='')
-        y = LinSweep(SMU, Vhi, Vneg, numPoints*2, timeStep, currProt)
+        writeMobility(outName,x)
+        print('Saved: 1...',end='')
+        y = LinSweep(SMU, Vhi, Vneg, (numPoints*2-1), timeStep, currProt)
+        writeMobility(outName,x+y)
         print('2...3...',end='')
         z = LinSweep(SMU, Vneg, 0, numPoints, timeStep, currProt)
-        print('4...',end='')
         totalVI = x + y + z
-
-        # Write IV Data to output file
-        outName = sampleName+'_'+startTimeStr
-        with open('{}.csv'.format(outName), 'w',newline='') as csvfile:
-            writer = csv.writer(csvfile)
-            row1 = ["Voltage (V)","Current (A)"]
-            writer.writerow(row1)
-            for row in totalVI:
-                writer.writerow(row)
-        print(" Data Saved")
+        writeMobility(outName,totalVI)
+        print('4...')
 
 # Turn off SMU output, close device connection
 SMU.write(':OUTP OFF')
