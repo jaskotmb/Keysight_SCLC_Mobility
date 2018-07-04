@@ -28,7 +28,7 @@ def LinSweep(SMUName, Vbegin, Vend, samplePoints, stepT, maxCurr):
     SMU.write(':TRIG:COUN {}'.format(samplePoints))
     SMU.write(':OUTP ON')
     SMU.write(':INIT (@1)')
-    time.sleep(totalTime + 2)
+    time.sleep(totalTime + 5)
     measCurr = SMU.query(':FETC:ARR:CURR? (@1)').split(',')
     sourceVolts = SMU.query(':FETC:ARR:VOLT? (@1)').split(',')
     VIpairs = list(zip(sourceVolts,measCurr))
@@ -62,7 +62,7 @@ print("Current Directory: {}".format(os.getcwd()))
 makeTodayDir()
 
 # Initializing sweep parameters
-timeStep = 0.1
+timeStep = 1
 numPoints = 1000
 Vhi = 10
 Vneg = -Vhi
@@ -70,7 +70,7 @@ currProt = 0.125
 mux = [1,2,3,4,5,6,7,8]
 each = ['V1','V2']
 timeBegin = datetime.datetime.now()
-elapse = 4*len(mux)*len(each)*(timeStep*numPoints+6.5)
+elapse = 4*len(mux)*len(each)*(timeStep*numPoints+9.5)
 timeEnd = timeBegin + datetime.timedelta(0,elapse)
 print("Measurement Begin: {:%A, %d %B %Y %H:%M:%S}".format(timeBegin))
 print("Measurement End:   {:%A, %d %B %Y %H:%M:%S}".format(timeEnd))
@@ -89,8 +89,11 @@ for i in mux:
         time.sleep(2)
 
         x = LinSweep(SMU, 0, Vhi, numPoints, timeStep, currProt)
+        print('1',end='')
         y = LinSweep(SMU, Vhi, Vneg, numPoints*2, timeStep, currProt)
+        print('23',end='')
         z = LinSweep(SMU, Vneg, 0, numPoints, timeStep, currProt)
+        print('4',end='')
         totalVI = x + y + z
 
         outName = sampleName+'_'+startTimeStr
