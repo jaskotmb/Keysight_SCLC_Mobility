@@ -103,6 +103,6 @@ for i in mux:
             writer.writerow(row1)
             for row in totalVI:
                 writer.writerow(row)
-        print("Data Saved")
+        print(" Data Saved")
 SMU.write(':OUTP OFF')
 SMU.close()
