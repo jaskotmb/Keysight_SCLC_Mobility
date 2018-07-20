@@ -22,7 +22,7 @@ OLEDTools.makeTodayDir()
 
 # Initializing sweep parameters
 timeStep = .05
-numPoints = 101
+numPoints = 1001
 Vhi = 10
 Vneg = -Vhi
 currProt = 0.125
