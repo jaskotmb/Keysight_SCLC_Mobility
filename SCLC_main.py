@@ -24,10 +24,10 @@ OLEDTools.makeTodayDir()
 timeStep = .05
 numPoints = 1001
 Vhi = 10
-Vneg = -Vhi
+Vneg = -10
 currProt = 0.125
-mux = [1]
-each = ['V1']
+mux = [8]
+each = ['V1','V2']
 timeBegin = datetime.datetime.now()
 elapse = 4*len(mux)*len(each)*(timeStep*numPoints) + 3*len(mux)*len(each)*14.5
 timeEnd = timeBegin + datetime.timedelta(0,elapse)
@@ -36,7 +36,7 @@ print("Measurement End:   {:%A, %d %B %Y %H:%M:%S}".format(timeEnd))
 
 for i in mux:
     for k in each:
-        sampleName = '180716Ge3'+str(i)+'-'+str(k)
+        sampleName = '180809Aah1'+str(i)+'-'+str(k)
         startTimeStr = OLEDTools.stringTime()
         print("Time: {}, Sample: {} ".format(startTimeStr,sampleName),end='')
         outName = sampleName+'_'+startTimeStr+'.csv'
@@ -60,5 +60,8 @@ for i in mux:
         OLEDTools.writeMobility(outName,totalVI)
         print('4...')
 
+        time.sleep(2)
+        ser.write(str.encode('+' + str(i)))
+        time.sleep(2)
 # Turn off SMU output, close device connection
 OLEDTools.SMUclose()
